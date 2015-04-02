@@ -1,0 +1,50 @@
+{
+
+
+
+
+
+
+    "creator": "Alexander F\u00e6r\u00f8y <ahf@0x90.dk>", 
+
+
+
+
+
+
+    "reporter": "Alexander F\u00e6r\u00f8y <ahf@0x90.dk>", 
+
+
+
+
+
+
+    "severity": "minor", 
+
+
+
+
+
+
+    "status": "open", 
+
+
+
+
+
+
+    "summary": "Install libsodium on Travis", 
+
+
+
+
+
+
+    "time": "Thu, 02 Apr 2015 16:59:26 +0000"
+
+
+
+
+
+
+}
