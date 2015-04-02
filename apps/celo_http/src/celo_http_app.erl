@@ -19,7 +19,9 @@ start(_Type, _Args) ->
     case celo_http_sup:start_link() of
         {ok, _} = Result ->
             Dispatch = cowboy_router:compile([
-                {'_', []}
+                {'_', [
+                    {"/[:public_key]/[:object_name]", celo_http_object_handler, []}
+                ]}
             ]),
 
             {ok, _} = cowboy:start_https(celo_https, 1000, [
