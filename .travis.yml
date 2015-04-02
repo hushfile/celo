@@ -6,7 +6,7 @@ otp_release:
     - 17.1
     - 17.0
 
-script: "make compile rel ct elvis"
+script: "make travis"
 
 notifications:
     irc:

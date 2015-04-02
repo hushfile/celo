@@ -24,4 +24,6 @@ console: rel
 elvis:
 	@$(ELVIS) -c elvis.config rock
 
-.PHONY: compile rel clean dialyzer ct console elvis
+travis: compile rel ct elvis
+
+.PHONY: compile rel clean dialyzer ct console elvis travis
