@@ -55,7 +55,7 @@ init([Name, Options]) ->
 
         true ->
             try
-                CallbackState = CallbackModule:init(Name, CallbackOptions),
+                {ok, CallbackState} = CallbackModule:init(Name, CallbackOptions),
                 {ok, State#state { callback_state = CallbackState }}
             catch
                 Class:Reason ->
