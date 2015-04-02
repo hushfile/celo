@@ -14,7 +14,8 @@
 -export([expand_tilde/1,
          home_dir/0,
          hex_to_binary/1,
-         binary_to_hex/1
+         binary_to_hex/1,
+         valid_hex/1
         ]).
 
 -include_lib("celo_core/include/celo_core_test.hrl").
@@ -57,10 +58,24 @@ binary_to_hex(Data) when is_binary(Data) ->
 binary_to_hex(Data) when is_list(Data) ->
     binary_to_hex(list_to_binary(Data)).
 
+%% @doc Check if a given input is a valid hex encoded binary.
+-spec valid_hex(Data :: binary()) -> boolean();
+               (Data :: string()) -> boolean().
+valid_hex(Data) when is_binary(Data) ->
+    valid_hex(binary:bin_to_list(Data));
+
+valid_hex(Data) when is_list(Data) ->
+    ValidValues = sets:from_list([$0, $1, $2, $3, $4, $5, $6, $7, $8, $9, $a, $A, $b, $B, $c, $C, $d, $D, $e, $E, $f, $F]),
+    lists:all(fun (Value) -> sets:is_element(Value, ValidValues) end, Data).
+
 -ifdef(TEST).
 
 prop_hex_iso() ->
     ?FORALL(Data, binary(),
         hex_to_binary(binary_to_hex(Data)) =:= Data).
+
+prop_valid_hex() ->
+    ?FORALL(Data, binary(),
+            valid_hex(binary_to_hex(Data)) =:= true).
 
 -endif.
