@@ -10,6 +10,7 @@
   {git,"git://github.com/ninenines/cowlib.git",
        {ref,"0bd62c8920cd7c0f901207320f07229452cc5681"}},
   1},
+ {<<"poolboy">>,{pkg,<<"poolboy">>,<<"1.4.2">>},0},
  {<<"lager">>,
   {git,"https://github.com/basho/lager.git",
        {ref,"d33ccf3b69de09a628fe38b4d7981bb8671b8a4f"}},

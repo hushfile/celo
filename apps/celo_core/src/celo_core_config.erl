@@ -11,7 +11,9 @@
 -module(celo_core_config).
 
 %% API.
--export([home_dir/0]).
+-export([home_dir/0,
+         storage/0
+        ]).
 
 %% Config API.
 -export([config_value/2,
@@ -25,6 +27,11 @@
 -spec home_dir() -> file:filename().
 home_dir() ->
     celo_core_utilities:expand_tilde(config_value(celo_core, home_dir)).
+
+%% @doc Fetch Celo's storage configuration.
+-spec storage() -> [celo_core_types:storage_spec()].
+storage() ->
+    config_value(celo_core, storage).
 
 %% @doc Fetch Key from a given application.
 -spec config_value(App :: atom(), Key :: key()) -> value().

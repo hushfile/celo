@@ -18,15 +18,35 @@
 
 %% @doc Check if a given object exists.
 -spec object_exists(PublicKey :: binary(), ObjectId :: binary()) -> boolean().
-object_exists(_PublicKey, _ObjectId) ->
-    true.
+object_exists(PublicKey, ObjectId) ->
+    dispatch({object_exists, PublicKey, ObjectId}).
 
 %% @doc Get object size in bytes.
 -spec object_size(PublicKey :: binary(), ObjectId :: binary()) -> {ok, pos_integer()} | {error, any()}.
-object_size(_PublicKey, _ObjectId) ->
-    8.
+object_size(PublicKey, ObjectId) ->
+    dispatch({object_size, PublicKey, ObjectId}).
 
 %% @doc Fetch object as a stream.
 -spec object_stream(PublicKey :: binary(), ObjectId :: binary(), Socket :: inet:socket(), Transport :: atom()) -> ok | {error, any()}.
-object_stream(_PublicKey, _ObjectId, Socket, Transport) ->
-    Transport:send(Socket, [<<"Loldongs">>]).
+object_stream(PublicKey, ObjectId, Socket, Transport) ->
+    dispatch({object_stream, PublicKey, ObjectId, Socket, Transport}).
+
+%% @private
+dispatch(Event) ->
+    Backends = lists:map(fun ({Name, _}) -> Name end, celo_core_config:storage()),
+    dispatch(Event, Backends).
+
+%% @private
+dispatch(Event, []) ->
+    lager:error("No backend handler for: ~p", [Event]),
+    error;
+
+dispatch(Event, [Backend | Rest]) ->
+    lager:info("Dispatching event (~p) to ~p", [Event, Backend]),
+    case poolboy:transaction(Backend, fun (Worker) -> gen_server:call(Worker, Event) end) of
+        ok ->
+            ok;
+
+        _Otherwise ->
+            dispatch(Event, Rest)
+    end.

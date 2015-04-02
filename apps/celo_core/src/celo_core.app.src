@@ -13,6 +13,7 @@
         enacl,
         kernel,
         lager,
+        poolboy,
         sasl,
         stdlib,
         syntax_tools
