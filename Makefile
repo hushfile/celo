@@ -15,6 +15,9 @@ clean:
 dialyzer:
 	@$(REBAR) dialyzer
 
+eunit:
+	@$(REBAR) eunit
+
 ct:
 	@$(REBAR) ct
 
@@ -27,6 +30,6 @@ console: rel
 elvis:
 	@$(ELVIS) -c elvis.config rock
 
-travis: update compile rel ct elvis
+travis: update compile rel eunit ct elvis
 
-.PHONY: compile rel clean dialyzer ct console update elvis travis
+.PHONY: compile rel clean dialyzer eunit ct console update elvis travis
