@@ -17,6 +17,8 @@
          binary_to_hex/1
         ]).
 
+-include_lib("celo_core/include/celo_core_test.hrl").
+
 -spec expand_tilde(Path :: file:filename()) -> file:filename().
 expand_tilde(Path) ->
     binary_to_list(iolist_to_binary(re:replace(Path, "~", home_dir()))).
