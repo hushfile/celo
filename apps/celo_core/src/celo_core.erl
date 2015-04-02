@@ -29,4 +29,4 @@ version() ->
 platform() ->
     ErlangVersion = erlang:system_info(otp_release),
     {Family, Name} = os:type(),
-    lists:flatten(io_lib:format("~s-~s on ~s/~s (OTP ~s)", [name(), version(), Family, Name, ErlangVersion])).
+    lists:flatten(io_lib:format("~s ~s on ~s/~s (OTP ~s)", [name(), version(), Family, Name, ErlangVersion])).
