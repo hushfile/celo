@@ -14,7 +14,8 @@
 -export([init/2,
          malformed_request/2,
          content_types_provided/2,
-         to_text/2
+         resource_exists/2,
+         to_file/2
         ]).
 
 -record(state, {
@@ -49,9 +50,14 @@ malformed_request(Req, #state { raw_public_key = RawPublicKey } = State) ->
     end.
 
 content_types_provided(Req, State) ->
-    {[
-      {<<"text/plain">>, to_text}
-     ], Req, State}.
+    {[{<<"application/octet-stream">>, to_file}], Req, State}.
 
-to_text(Req, State) ->
-    {<<"Yo!", $\n>>, Req, State}.
+resource_exists(Req, #state { public_key = PublicKey, object_id = ObjectId } = State) ->
+    {celo_core_storage:object_exists(PublicKey, ObjectId), Req, State}.
+
+to_file(Req, #state { public_key = PublicKey, object_id = ObjectId } = State) ->
+    Size = celo_core_storage:object_size(PublicKey, ObjectId),
+    StreamFun = fun (Socket, Transport) ->
+                    celo_core_storage:object_stream(PublicKey, ObjectId, Socket, Transport)
+                end,
+    {{stream, Size, StreamFun}, Req, State}.
