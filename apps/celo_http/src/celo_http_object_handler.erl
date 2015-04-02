@@ -18,20 +18,35 @@
         ]).
 
 -record(state, {
+    %% Raw Input.
     raw_public_key  :: binary(),
-    raw_object_name :: binary()
+    raw_object_name :: binary(),
+
+    public_key :: binary(),
+    object_id  :: binary()
 }).
 
 init(Req, _Opts) ->
     RawPublicKey  = cowboy_req:binding(public_key, Req, <<>>),
     RawObjectName = cowboy_req:binding(object_name, Req, <<>>),
+
     {cowboy_rest, Req, #state {
         raw_public_key  = RawPublicKey,
-        raw_object_name = RawObjectName
+        raw_object_name = RawObjectName,
+
+        public_key = undefined,
+        object_id  = crypto:hash(sha256, RawObjectName)
     }}.
 
-malformed_request(Req, State) ->
-    {false, Req, State}.
+malformed_request(Req, #state { raw_public_key = RawPublicKey } = State) ->
+    case celo_core_utilities:valid_hex(RawPublicKey) of
+        false ->
+            {false, Req, State};
+
+        true ->
+            PublicKey = celo_core_utilities:hex_to_binary(RawPublicKey),
+            {byte_size(PublicKey) =/= enacl:crypto_sign_ed25519_public_size(), Req, State#state { public_key = PublicKey }}
+    end.
 
 content_types_provided(Req, State) ->
     {[
