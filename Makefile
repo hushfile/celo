@@ -18,12 +18,15 @@ dialyzer:
 ct:
 	@$(REBAR) ct
 
+update:
+	@$(REBAR) update
+
 console: rel
 	_build/rel/celo/bin/celo console
 
 elvis:
 	@$(ELVIS) -c elvis.config rock
 
-travis: compile rel ct elvis
+travis: update compile rel ct elvis
 
-.PHONY: compile rel clean dialyzer ct console elvis travis
+.PHONY: compile rel clean dialyzer ct console update elvis travis
