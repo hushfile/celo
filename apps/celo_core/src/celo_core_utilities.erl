@@ -56,3 +56,11 @@ binary_to_hex(Data) when is_binary(Data) ->
 
 binary_to_hex(Data) when is_list(Data) ->
     binary_to_hex(list_to_binary(Data)).
+
+-ifdef(TEST).
+
+prop_hex_iso() ->
+    ?FORALL(Data, binary(),
+        hex_to_binary(binary_to_hex(Data)) =:= Data).
+
+-endif.
