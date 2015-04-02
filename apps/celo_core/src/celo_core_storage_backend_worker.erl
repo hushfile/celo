@@ -38,10 +38,11 @@ start_link(Args) ->
 init([Name, Options]) ->
     {CallbackModule, CallbackOptions} = proplists:get_value(backend, Options),
 
+    lager:info("Starting storage backend worker: ~s (~p)", [Name, self()]),
+
     %% FIXME(ahf): Ensure that the module is loaded before calling into it.
     code:ensure_loaded(CallbackModule),
 
-    lager:info("Starting storage backend worker: ~s (~p)", [Name, self()]),
     State = #state {
             name = Name,
             callback_options = CallbackOptions,
