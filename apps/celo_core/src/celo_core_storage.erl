@@ -19,12 +19,12 @@
 %% @doc Check if a given object exists.
 -spec object_exists(PublicKey :: binary(), ObjectId :: binary()) -> boolean().
 object_exists(PublicKey, ObjectId) ->
-    dispatch({object_exists, PublicKey, ObjectId}) =:= true.
+    dispatch({object_exists, [PublicKey, ObjectId]}) =:= true.
 
 %% @doc Get object size in bytes.
 -spec object_size(PublicKey :: binary(), ObjectId :: binary()) -> {ok, pos_integer()} | {error, any()}.
 object_size(PublicKey, ObjectId) ->
-    case dispatch({object_size, PublicKey, ObjectId}) of
+    case dispatch({object_size, [PublicKey, ObjectId]}) of
         Size when is_integer(Size) ->
             Size;
 
@@ -35,7 +35,7 @@ object_size(PublicKey, ObjectId) ->
 %% @doc Fetch object as a stream.
 -spec object_stream(PublicKey :: binary(), ObjectId :: binary(), Socket :: inet:socket(), Transport :: atom()) -> ok | {error, any()}.
 object_stream(PublicKey, ObjectId, Socket, Transport) ->
-    dispatch({object_stream, PublicKey, ObjectId, Socket, Transport}).
+    dispatch({object_stream, [PublicKey, ObjectId, Socket, Transport]}).
 
 %% @private
 dispatch(Event) ->
@@ -50,9 +50,9 @@ dispatch(Event, []) ->
 dispatch(Event, [Backend | Rest]) ->
     lager:info("Dispatching event (~p) to ~p", [Event, Backend]),
     case poolboy:transaction(Backend, fun (Worker) -> gen_server:call(Worker, Event) end) of
-        ok ->
-            ok;
+        error ->
+            dispatch(Event, Rest);
 
-        _Otherwise ->
-            dispatch(Event, Rest)
+        Value ->
+            Value
     end.

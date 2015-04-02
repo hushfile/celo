@@ -37,6 +37,10 @@ start_link(Args) ->
 
 init([Name, Options]) ->
     {CallbackModule, CallbackOptions} = proplists:get_value(backend, Options),
+
+    %% FIXME(ahf): Ensure that the module is loaded before calling into it.
+    code:ensure_loaded(CallbackModule),
+
     lager:info("Starting storage backend worker: ~s (~p)", [Name, self()]),
     State = #state {
             name = Name,
@@ -59,9 +63,20 @@ init([Name, Options]) ->
             end
     end.
 
-handle_call(Request, _From, State) ->
-    lager:info("Request: ~p (~p)", [Request, self()]),
-    {reply, ok, State}.
+handle_call({Request, Args}, _From, #state { callback_module = CallbackModule, callback_state = CallbackState } = State) when is_atom(Request), is_list(Args) ->
+    RequestArgs = Args ++ [CallbackState],
+    case erlang:function_exported(CallbackModule, Request, length(RequestArgs)) of
+        false ->
+            lager:warning("Unhandled request: ~p (~p)", [Request, RequestArgs]),
+            {reply, error, State};
+
+        true ->
+            {Reply, NewCallbackState} = erlang:apply(CallbackModule, Request, RequestArgs),
+            {reply, Reply, State#state { callback_state = NewCallbackState }}
+    end;
+
+handle_call(_Request, _From, State) ->
+    {reply, error, State}.
 
 handle_cast(_Msg, State) ->
     {noreply, State}.
