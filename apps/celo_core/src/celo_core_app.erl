@@ -16,48 +16,8 @@
 
 -spec start(normal | {takeover, node()} | {failover, node()}, term()) -> {ok, pid()} | {error, term()}.
 start(_Type, _Args) ->
-    case celo_core_sup:start_link() of
-        {ok, _} = Result ->
-            ok = start_storage_backends(),
-
-            Result;
-
-        {error, _} = Error ->
-            Error
-    end.
+    celo_core_sup:start_link().
 
 -spec stop([]) -> ok.
 stop(_State) ->
     ok.
-
--spec start_storage_backends() -> ok.
-start_storage_backends() ->
-    StorageBackends = celo_core_config:storage(),
-    start_storage_backends(StorageBackends).
-
--spec start_storage_backends(Backends :: term()) -> ok.
-start_storage_backends([]) ->
-    ok;
-
-start_storage_backends([{Identifier, Options} | Rest]) ->
-    case proplists:get_value(backend, Options) of
-        undefined ->
-            lager:error("Undefined backend for ~s", [Identifier]);
-
-        {BackendHandler, BackendOptions} ->
-            lager:info("Starting storage backend: ~s (~s)", [Identifier, BackendHandler]),
-
-            case erlang:function_exported(BackendHandler, init, 1) of
-                true ->
-                    try
-                        BackendHandler:init(Identifier, BackendOptions)
-                    catch
-                        Class:Reason ->
-                            lager:error("Error in backend initializer for ~s: ~p/~p", [Identifier, Class, Reason])
-                    end;
-
-                false ->
-                    ok
-            end
-    end,
-    start_storage_backends(Rest).
