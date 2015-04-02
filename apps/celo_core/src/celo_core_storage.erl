@@ -19,12 +19,18 @@
 %% @doc Check if a given object exists.
 -spec object_exists(PublicKey :: binary(), ObjectId :: binary()) -> boolean().
 object_exists(PublicKey, ObjectId) ->
-    dispatch({object_exists, PublicKey, ObjectId}).
+    dispatch({object_exists, PublicKey, ObjectId}) =:= true.
 
 %% @doc Get object size in bytes.
 -spec object_size(PublicKey :: binary(), ObjectId :: binary()) -> {ok, pos_integer()} | {error, any()}.
 object_size(PublicKey, ObjectId) ->
-    dispatch({object_size, PublicKey, ObjectId}).
+    case dispatch({object_size, PublicKey, ObjectId}) of
+        Size when is_integer(Size) ->
+            Size;
+
+        error ->
+            0
+    end.
 
 %% @doc Fetch object as a stream.
 -spec object_stream(PublicKey :: binary(), ObjectId :: binary(), Socket :: inet:socket(), Transport :: atom()) -> ok | {error, any()}.
