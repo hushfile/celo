@@ -1,0 +1,9 @@
+# Bugs Everywhere.
+.be/id-cache
+
+# Erlang.
+*.plt
+.rebar3
+_build/
+ebin/
+logs/

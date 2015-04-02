@@ -1,0 +1,9 @@
+## Name of the node.
+-sname celo
+
+## Cookie for distributed Erlang.
+-setcookie celo
+
+## Enable kernel poll and a few async threads.
++K true
++A30

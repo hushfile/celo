@@ -1,0 +1,23 @@
+language: erlang
+
+otp_release:
+    - 17.5
+    - 17.4
+    - 17.3
+    - 17.2
+    - 17.1
+    - 17.0
+
+script: "make compile rel ct elvis"
+
+notifications:
+    irc:
+        channels:
+            - "chat.freenode.net#hushfile"
+        template:
+            - "%{repository} (%{commit}: %{author}): %{message}"
+            - "Build details : %{build_url}"
+        on_success: always
+        on_failure: always
+        use_notice: true
+        skip_join: true
