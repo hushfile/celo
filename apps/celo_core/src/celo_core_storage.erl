@@ -13,7 +13,7 @@
 %% API.
 -export([object_exists/2,
          object_size/2,
-         object_stream/4
+         object_stream/2
         ]).
 
 %% @doc Check if a given object exists.
@@ -33,9 +33,9 @@ object_size(PublicKey, ObjectId) ->
     end.
 
 %% @doc Fetch object as a stream.
--spec object_stream(PublicKey :: binary(), ObjectId :: binary(), Socket :: inet:socket(), Transport :: atom()) -> ok | {error, any()}.
-object_stream(PublicKey, ObjectId, Socket, Transport) ->
-    dispatch({object_stream, [PublicKey, ObjectId, Socket, Transport]}).
+-spec object_stream(PublicKey :: binary(), ObjectId :: binary()) -> ok | {error, any()}.
+object_stream(PublicKey, ObjectId) ->
+    dispatch({object_stream, [PublicKey, ObjectId]}).
 
 %% @private
 dispatch(Event) ->
@@ -44,11 +44,11 @@ dispatch(Event) ->
 
 %% @private
 dispatch(Event, []) ->
-    lager:error("No backend handler for: ~p", [Event]),
+    lager:debug("No backend handler for: ~p", [Event]),
     error;
 
 dispatch(Event, [Backend | Rest]) ->
-    lager:info("Dispatching event (~p) to ~p", [Event, Backend]),
+    lager:debug("Dispatching event (~p) to ~p", [Event, Backend]),
     case poolboy:transaction(Backend, fun (Worker) -> gen_server:call(Worker, Event) end) of
         error ->
             dispatch(Event, Rest);

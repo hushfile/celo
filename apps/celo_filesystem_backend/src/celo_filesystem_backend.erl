@@ -13,7 +13,7 @@
 -export([init/2,
          object_exists/3,
          object_size/3,
-         object_stream/5
+         object_stream/3
         ]).
 
 -record(state, {
@@ -42,16 +42,18 @@ init(Name, Options) ->
 
 object_exists(PublicKey, ObjectId, State) ->
     Path = path(State, PublicKey, ObjectId),
-    lager:info("Object!: ~p", [Path]),
     {filelib:is_file(Path), State}.
 
 object_size(PublicKey, ObjectId, State) ->
     Path = path(State, PublicKey, ObjectId),
     {filelib:file_size(Path), State}.
 
-object_stream(PublicKey, ObjectId, Socket, Transport, State) ->
+object_stream(PublicKey, ObjectId, State) ->
     Path = path(State, PublicKey, ObjectId),
-    Transport:sendfile(Socket, Path).
+    Fun = fun (Socket, Transport) ->
+              Transport:sendfile(Socket, Path)
+          end,
+    {Fun, State}.
 
 path(State, PublicKey, ObjectId) ->
     {PKHead, PKTail} = split(celo_core_utilities:binary_to_hex(PublicKey)),

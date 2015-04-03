@@ -57,7 +57,10 @@ resource_exists(Req, #state { public_key = PublicKey, object_id = ObjectId } = S
 
 to_file(Req, #state { public_key = PublicKey, object_id = ObjectId } = State) ->
     Size = celo_core_storage:object_size(PublicKey, ObjectId),
-    StreamFun = fun (Socket, Transport) ->
-                    celo_core_storage:object_stream(PublicKey, ObjectId, Socket, Transport)
-                end,
-    {{stream, Size, StreamFun}, Req, State}.
+    case celo_core_storage:object_stream(PublicKey, ObjectId) of
+        StreamFun when is_function(StreamFun) ->
+            {{stream, Size, StreamFun}, Req, State};
+
+        _Otherwise ->
+            {<<>>, Req, State}
+    end.

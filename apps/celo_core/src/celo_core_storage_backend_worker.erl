@@ -64,7 +64,8 @@ init([Name, Options]) ->
             end
     end.
 
-handle_call({Request, Args}, _From, #state { callback_module = CallbackModule, callback_state = CallbackState } = State) when is_atom(Request), is_list(Args) ->
+handle_call({Request, [PublicKey, ObjectId] = Args}, _From, #state { callback_module = CallbackModule, callback_state = CallbackState } = State) when is_atom(Request), is_list(Args) ->
+    lager:info("Request ~s/~s (Type: ~s)", [celo_core_utilities:binary_to_hex(PublicKey), celo_core_utilities:binary_to_hex(ObjectId), Request]),
     RequestArgs = Args ++ [CallbackState],
     case erlang:function_exported(CallbackModule, Request, length(RequestArgs)) of
         false ->
