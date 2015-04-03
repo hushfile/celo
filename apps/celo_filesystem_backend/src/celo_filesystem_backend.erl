@@ -51,7 +51,7 @@ object_size(PublicKey, ObjectId, State) ->
 
 object_stream(PublicKey, ObjectId, Socket, Transport, State) ->
     Path = path(State, PublicKey, ObjectId),
-    Transport:sendfile(Path, Socket).
+    Transport:sendfile(Socket, Path).
 
 path(State, PublicKey, ObjectId) ->
     {PKHead, PKTail} = split(celo_core_utilities:binary_to_hex(PublicKey)),
