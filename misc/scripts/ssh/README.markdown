@@ -3,7 +3,7 @@ SSH Challenge Auth for Celo
 
 1. Install `pysodium` with:
 
-    $ pip install pysodium
+        $ pip install pysodium
 
 2. Create an ed25519 key pair:
 
