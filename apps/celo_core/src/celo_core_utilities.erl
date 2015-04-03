@@ -15,7 +15,9 @@
          home_dir/0,
          hex_to_binary/1,
          binary_to_hex/1,
-         valid_hex/1
+         valid_hex/1,
+         valid_public_key/1,
+         valid_hex_public_key/1
         ]).
 
 -include_lib("celo_core/include/celo_core_test.hrl").
@@ -67,6 +69,16 @@ valid_hex(Data) when is_binary(Data) ->
 valid_hex(Data) when is_list(Data) ->
     ValidValues = sets:from_list([$0, $1, $2, $3, $4, $5, $6, $7, $8, $9, $a, $A, $b, $B, $c, $C, $d, $D, $e, $E, $f, $F]),
     lists:all(fun (Value) -> sets:is_element(Value, ValidValues) end, Data).
+
+%% @doc Check if a given public key is valid.
+-spec valid_public_key(PublicKey :: binary()) -> boolean().
+valid_public_key(PublicKey) when is_binary(PublicKey) ->
+    byte_size(PublicKey) =:= enacl:crypto_sign_ed25519_public_size().
+
+%% @doc Check if a given hex encoded public key is valid.
+-spec valid_hex_public_key(PublicKey :: binary()) -> boolean().
+valid_hex_public_key(PublicKey) when is_binary(PublicKey) ->
+    valid_hex(PublicKey) andalso valid_public_key(hex_to_binary(PublicKey)).
 
 -ifdef(TEST).
 

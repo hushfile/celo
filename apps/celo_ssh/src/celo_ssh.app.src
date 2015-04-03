@@ -1,0 +1,28 @@
+%%%
+%%% Copyright (c) 2015 The Celo Authors. All rights reserved.
+%%% Use of this source code is governed by a BSD-style
+%%% license that can be found in the LICENSE file.
+%%%
+{application, celo_ssh, [
+    {description, "Celo SSH"},
+    {vsn, "0.1.0"},
+    {id, "git"},
+    {modules, []},
+    {registered, []},
+    {applications, [
+        celo_core,
+        crypto,
+        enacl,
+        kernel,
+        lager,
+        public_key,
+        sasl,
+        ssh,
+        stdlib,
+        syntax_tools
+    ]},
+    {mod, {celo_ssh_app, []}},
+    {env, []}
+]}.
+
+%% vim: set ft=erlang et :
